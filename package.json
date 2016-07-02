@@ -1,0 +1,38 @@
+{
+  "name": "api-inspect",
+  "version": "0.0.0",
+  "description": "API inpection library",
+  "license": "MIT",
+  "keywords": [
+    "api",
+    "rest",
+    "inspect",
+    "expect",
+    "test",
+    "tests",
+    "inspect.js",
+    "mocha"
+  ],
+  "main": "apiInspect.js",
+  "author": {
+    "name": "Andi Heinkelein",
+    "email": "andifeind@noname-media.com",
+    "url": ""
+  },
+  "dependencies": {
+    "inspect.js": "^1.0.0",
+    "supertest": "^1.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha tests/ --recursive"
+  },
+  "homepage": "https://github.com/andifeind/api-inspect",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andifeind/api-inspect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andifeind/api-inspect/issues"
+  }
+}
