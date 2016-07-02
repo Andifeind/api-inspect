@@ -36,7 +36,7 @@ api.get('/api/info').test(inspect => {
   // do your tests
 });
 
-// API calls to the internet still work
+// API calls to the internet will still work
 api.get('http://inspectjs.com/test').test(inspect => {
   // do your tests
 });
