@@ -1,11 +1,12 @@
 'use strict';
 
 let inspect = require('inspect.js');
-let sinon = require('sinon');
-inspect.useSinon(sinon);
 
 let apiInspect = require('../apiInspect');
 let APITest = require('../lib/apiTest');
+let app = require('../examples/server');
+
+apiInspect.setApi(app);
 
 describe('APIInspect', function() {
   describe('instance', function() {
@@ -21,13 +22,58 @@ describe('APIInspect', function() {
   });
 
   describe('get', function() {
-    it('Should add new test', function() {
+    it('Should add new get test', function() {
       apiInspect.get('/test/one');
-      apiInspect.get('/test/two');
 
-      inspect(apiInspect.queue).hasLength(2);
-      inspect(apiInspect.queue[0]).isInstanceOf(APITest);
-      inspect(apiInspect.queue[1]).isInstanceOf(APITest);
+      inspect(apiInspect.req).isObject();
+    });
+  });
+
+  describe('post', function() {
+    it('Should add new post test', function() {
+      apiInspect.post('/test/one');
+
+      inspect(apiInspect.req).isObject();
+    });
+  });
+
+  describe('put', function() {
+    it('Should add new put test', function() {
+      apiInspect.put('/test/one');
+
+      inspect(apiInspect.req).isObject();
+    });
+  });
+
+  describe('patch', function() {
+    it('Should add new patch test', function() {
+      apiInspect.patch('/test/one');
+
+      inspect(apiInspect.req).isObject();
+    });
+  });
+
+  describe('delete', function() {
+    it('Should add new delete test', function() {
+      apiInspect.delete('/test/one');
+
+      inspect(apiInspect.req).isObject();
+    });
+  });
+
+  describe('head', function() {
+    it('Should add new head test', function() {
+      apiInspect.head('/test/one');
+
+      inspect(apiInspect.req).isObject();
+    });
+  });
+
+  describe('options', function() {
+    it('Should add new options test', function() {
+      apiInspect.options('/test/one');
+
+      inspect(apiInspect.req).isObject();
     });
   });
 });
