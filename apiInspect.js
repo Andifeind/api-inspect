@@ -23,16 +23,66 @@ class APIInspect {
     this.api = apiUrl;
   }
 
-  get(apiUrl) {
+  getHost(apiUrl) {
     let host = this.api;
     let path = apiUrl;
     if (/https?:\/\//.test(apiUrl)) {
-      let uri = url.parse(apiUrl, true, true);
-      host = uri.protocol + uri.host;
+      let uri = url.parse(apiUrl, true);
+      host = uri.protocol + '//' + uri.host;
       path = uri.pathname;
     }
 
-    this.req = supertest(host).get(path);
+    return {
+      host,
+      path
+    };
+  }
+
+  get(apiUrl) {
+    let server = this.getHost(apiUrl);
+    this.req = supertest(server.host).get(server.path);
+
+    return this;
+  }
+
+  post(apiUrl) {
+    let server = this.getHost(apiUrl);
+    this.req = supertest(server.host).post(server.path);
+
+    return this;
+  }
+
+  put(apiUrl) {
+    let server = this.getHost(apiUrl);
+    this.req = supertest(server.host).put(server.path);
+
+    return this;
+  }
+
+  patch(apiUrl) {
+    let server = this.getHost(apiUrl);
+    this.req = supertest(server.host).patch(server.path);
+
+    return this;
+  }
+
+  delete(apiUrl) {
+    let server = this.getHost(apiUrl);
+    this.req = supertest(server.host).delete(server.path);
+
+    return this;
+  }
+
+  options(apiUrl) {
+    let server = this.getHost(apiUrl);
+    this.req = supertest(server.host).options(server.path);
+
+    return this;
+  }
+
+  head(apiUrl) {
+    let server = this.getHost(apiUrl);
+    this.req = supertest(server.host).head(server.path);
 
     return this;
   }
@@ -48,6 +98,11 @@ class APIInspect {
 
   query(query, value) {
     this.req.query(query, value);
+    return this;
+  }
+
+  body(data, value) {
+    this.req.send(data, value);
     return this;
   }
 
@@ -71,21 +126,7 @@ class APIInspect {
           res.responseTime = responseTime;
           this.log(res);
           apiTest.setResponse(res);
-
-          let exports = inspect;
-          // function(input) {
-          //   return inspect(input);
-          // };
-
-          for (let el in apiTest) {
-            if (typeof apiTest[el] === 'function') {
-              exports[el] = apiTest[el].bind(apiTest);
-            }
-          }
-
-          exports.body = apiTest.body;
-
-          item.test(exports);
+          item.test(apiTest);
           next();
         });
       }).then(this.__resolve).catch(this.__reject);
