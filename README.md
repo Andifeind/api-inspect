@@ -1,5 +1,7 @@
 API inpection library
 
+[![Build Status](https://travis-ci.org/Andifeind/api-inspect.svg?branch=master)](https://travis-ci.org/Andifeind/api-inspect)
+
 ## Install
 
 ```sh
