@@ -11,15 +11,16 @@ $ npm install api-inspect
 ## Usage
 
 ```js
-let api = require('api-inspect');
+let apiInspect = require('api-inspect');
+let inspect = require('inspect.js');
 
-api.get('http://example.com/api/info').test(inspect => {
-  inspect.statusCode(200);
-  inspect.responseTime(50);
-  inspect.contentType('application/json');
+apiInspect.get('http://example.com/api/info').test((ctx) => {
+  ctx.statusCode(200);
+  ctx.responseTime(50);
+  ctx.contentType('application/json');
 
-  inspect(inspect.body).isJSON();
-  inspect(inspect.body).isEql({
+  inspect(ctx.body).isJSON();
+  inspect(ctx.body).isEql({
     state: 'OK',
     version: 'v1.0.1'
   });
@@ -30,16 +31,16 @@ api.get('http://example.com/api/info').test(inspect => {
 ### Call express routes
 
 ```js
-let api = require('api-inspect');
+let apiInspect = require('api-inspect');
 let app = express(); // gets express app anywhere
 
-api.setApp(app);
-api.get('/api/info').test(inspect => {
+apiInspect.setApi(app);
+apiInspect.get('/api/info').test(ctx => {
   // do your tests
 });
 
 // API calls to the internet will still work
-api.get('http://inspectjs.com/test').test(inspect => {
+apiInspect.get('http://inspectjs.com/test').test(ctx => {
   // do your tests
 });
 

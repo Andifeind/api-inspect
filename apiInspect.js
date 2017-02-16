@@ -10,13 +10,8 @@ let APITest = require('./lib/apiTest');
 
 class APIInspect {
   constructor() {
-    this.queue = new SuperQ();
-    this.done = new Promise((resolve, reject) => {
-      this.__resolve = resolve;
-      this.__reject = reject;
-    });
-
-    this.isRunning = false;
+    this.supertest = null;
+    this.logEnabled = false;
   }
 
   setApi(apiUrl) {
@@ -38,57 +33,79 @@ class APIInspect {
     };
   }
 
-  get(apiUrl) {
+  get(apiUrl, query) {
     let server = this.getHost(apiUrl);
     this.req = supertest(server.host).get(server.path);
+    if (query) {
+      this.query(query);
+    }
 
     return this;
   }
 
-  post(apiUrl) {
-    let server = this.getHost(apiUrl);
-    this.req = supertest(server.host).post(server.path);
+  post(apiUrl, data) {
+    const server = this.getHost(apiUrl);
+    this.supertest = supertest(server.host);
+    this.req = this.supertest.post(server.path);
+    if (data) {
+      this.body(data);
+    }
 
     return this;
   }
 
-  put(apiUrl) {
-    let server = this.getHost(apiUrl);
-    this.req = supertest(server.host).put(server.path);
+  put(apiUrl, data) {
+    const server = this.getHost(apiUrl);
+    this.supertest = supertest(server.host);
+    this.req = this.supertest.put(server.path);
+    if (data) {
+      this.body(data);
+    }
 
     return this;
   }
 
-  patch(apiUrl) {
-    let server = this.getHost(apiUrl);
-    this.req = supertest(server.host).patch(server.path);
+  patch(apiUrl, data) {
+    const server = this.getHost(apiUrl);
+    this.supertest = supertest(server.host);
+    this.req = this.supertest.patch(server.path);
+    if (data) {
+      this.body(data);
+    }
 
     return this;
   }
 
-  delete(apiUrl) {
-    let server = this.getHost(apiUrl);
-    this.req = supertest(server.host).delete(server.path);
+  delete(apiUrl, query) {
+    const server = this.getHost(apiUrl);
+    this.supertest = supertest(server.host);
+    this.req = this.supertest.delete(server.path);
+    if (query) {
+      this.query(query);
+    }
 
     return this;
   }
 
   options(apiUrl) {
-    let server = this.getHost(apiUrl);
-    this.req = supertest(server.host).options(server.path);
+    const server = this.getHost(apiUrl);
+    this.supertest = supertest(server.host);
+    this.req = this.supertest.options(server.path);
 
     return this;
   }
 
   head(apiUrl) {
-    let server = this.getHost(apiUrl);
-    this.req = supertest(server.host).head(server.path);
+    const server = this.getHost(apiUrl);
+    this.supertest = supertest(server.host);
+    this.req = this.supertest.head(server.path);
 
     return this;
   }
 
-  log(res) {
-    console.log('api call to `%s` responds with %s after %sms', res.req.path, res.statusCode, res.responseTime);
+  get log() {
+    this.logEnabled = true;
+    return this;
   }
 
   header(header, value) {
@@ -107,34 +124,34 @@ class APIInspect {
   }
 
   test(fn) {
-    this.queue.push({
-      req: this.req,
-      test: fn
+    return new Promise((resolve, reject) => {
+      const apiTest = new APITest();
+      const time = Date.now();
+      this.req.end((err, res) => {
+        const responseTime = Date.now() - time;
+        const apiRequest = this.req;
+        const apiResponse = res;
+
+        if (this.logEnabled) {
+          console.log('api call to `%s %s` responds with %s after %sms',
+            res.req.method,
+            res.req.path,
+            res.statusCode,
+            responseTime
+          );
+        }
+
+        if (err) {
+          throw err;
+        }
+
+        res.responseTime = responseTime;
+        apiTest.setRequest(this.req);
+        apiTest.setResponse(res);
+        fn(apiTest, apiRequest, apiResponse);
+        resolve(apiTest);
+      });
     });
-
-    let apiTest = new APITest();
-
-    if (!this.isRunning) {
-      this.queue.run((item, next) => {
-        let time = Date.now();
-        item.req.end((err, res) => {
-          let responseTime = Date.now() - time;
-          if (err) {
-            throw err;
-          }
-
-          res.responseTime = responseTime;
-          this.log(res);
-          apiTest.setResponse(res);
-          item.test(apiTest);
-          next();
-        });
-      }).then(this.__resolve).catch(this.__reject);
-
-      this.isRunning = true;
-    }
-
-    return apiTest;
   }
 }
 
