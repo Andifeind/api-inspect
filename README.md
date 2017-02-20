@@ -25,7 +25,6 @@ apiInspect.get('http://example.com/api/info').test((ctx) => {
     version: 'v1.0.1'
   });
 });
-
 ```
 
 ### Call express routes
@@ -43,5 +42,4 @@ apiInspect.get('/api/info').test(ctx => {
 apiInspect.get('http://inspectjs.com/test').test(ctx => {
   // do your tests
 });
-
 ```
